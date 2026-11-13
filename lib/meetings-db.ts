@@ -1,201 +1,150 @@
+import { neon } from '@neondatabase/serverless';
 import type { SacramentMeeting } from './types';
 
-// Temporary in-memory data. This will be replaced by a real database in later weeks.
-const meetings: SacramentMeeting[] = [
-  {
-    id: 1,
-    date: '2026-05-03',
-    meetingType: 'testimony',
-    presiding: 'Bishop Smith',
-    conducting: 'Brother Jones',
-    announcements: ['Ward temple night: May 10', 'Youth service project on Saturday at 9:00 a.m.'],
-    openingHymn: { number: 2, title: 'The Spirit of God' },
-    openingPrayer: 'Sister Williams',
-    wardBusiness: [{ description: 'Sustaining of Sister Okafor as Primary president' }],
-    stakeBusiness: false,
-    sacramentHymn: { number: 169, title: 'As Now We Take the Sacrament' },
-    speakers: [],
-    closingHymn: { number: 85, title: 'How Firm a Foundation' },
-    closingPrayer: 'Brother Davis',
-  },
-  {
-    id: 2,
-    date: '2026-10-04',
-    meetingType: 'general',
-    presiding: 'General Authorities',
-    conducting: 'General Conference broadcast',
-    announcements: ['No sacrament meeting this week. Watch General Conference at home or at the meetinghouse.'],
-    openingHymn: { number: 19, title: 'We Thank Thee, O God, for a Prophet' },
-    openingPrayer: 'As assigned by the conference',
-    wardBusiness: [],
-    stakeBusiness: false,
-    sacramentHymn: { number: 0, title: 'No sacrament administered' },
-    speakers: [],
-    closingHymn: { number: 152, title: 'God Be with You Till We Meet Again' },
-    closingPrayer: 'As assigned by the conference',
-  },
-  {
-    id: 3,
-    date: '2026-10-11',
-    meetingType: 'regular',
-    presiding: 'Bishop Smith',
-    conducting: 'Brother Mahlalela',
-    announcements: ['Ward choir practice after church in the chapel'],
-    openingHymn: { number: 6, title: 'Redeemer of Israel' },
-    openingPrayer: 'Sister Nkosi',
-    wardBusiness: [
-      { description: 'Release of Brother Peters as Sunday School teacher' },
-      { description: 'Sustaining of Sister Dube as Sunday School teacher' },
-    ],
-    stakeBusiness: false,
-    sacramentHymn: { number: 171, title: 'With Humble Heart' },
-    speakers: [
-      { name: 'Sister Dlamini', topic: 'The blessings of the sacrament', type: 'speaker' },
-      { name: 'Brother Peters', topic: 'Ministering like the Savior', type: 'speaker' },
-    ],
-    closingHymn: { number: 98, title: 'I Need Thee Every Hour' },
-    closingPrayer: 'Brother Simelane',
-  },
-  {
-    id: 4,
-    date: '2026-10-18',
-    meetingType: 'stake',
-    presiding: 'President Mthembu',
-    conducting: 'President Mthembu',
-    announcements: ['Stake conference is held at the stake center. There is no ward sacrament meeting.'],
-    openingHymn: { number: 41, title: 'Let Zion in Her Beauty Rise' },
-    openingPrayer: 'Brother Hlophe',
-    wardBusiness: [],
-    stakeBusiness: true,
-    sacramentHymn: { number: 0, title: 'No sacrament administered' },
-    speakers: [
-      { name: 'Elder Ncube', topic: 'Gathering Israel on both sides of the veil', type: 'speaker' },
-      { name: 'Stake Choir', topic: 'Come, Thou Fount of Every Blessing', type: 'musical-number' },
-      { name: 'President Mthembu', topic: 'Strengthening our homes', type: 'speaker' },
-    ],
-    closingHymn: { number: 30, title: 'Come, Come, Ye Saints' },
-    closingPrayer: 'Sister Hlophe',
-  },
-  {
-    id: 5,
-    date: '2026-10-25',
-    meetingType: 'regular',
-    presiding: 'Bishop Smith',
-    conducting: 'Brother Jones',
-    openingHymn: { number: 3, title: 'Now Let Us Rejoice' },
-    openingPrayer: 'Brother Dube',
-    wardBusiness: [],
-    stakeBusiness: true,
-    sacramentHymn: { number: 193, title: 'I Stand All Amazed' },
-    speakers: [
-      { name: 'Brother Kunene', topic: 'Faith in Jesus Christ', type: 'speaker' },
-      { name: 'Primary Children', topic: 'I Am a Child of God', type: 'musical-number' },
-      { name: 'Sister Kunene', topic: 'Following the living prophet', type: 'speaker' },
-    ],
-    closingHymn: { number: 86, title: 'How Great Thou Art' },
-    closingPrayer: 'Sister Mamba',
-  },
-  {
-    id: 6,
-    date: '2026-11-01',
-    meetingType: 'testimony',
-    presiding: 'Bishop Smith',
-    conducting: 'Brother Mahlalela',
-    announcements: ['Fast offerings may be given to any member of the bishopric'],
-    openingHymn: { number: 136, title: 'I Know That My Redeemer Lives' },
-    openingPrayer: 'Sister Shongwe',
-    wardBusiness: [{ description: 'Ordination of Brother Zwane to the office of priest' }],
-    stakeBusiness: false,
-    sacramentHymn: { number: 181, title: 'Jesus of Nazareth, Savior and King' },
-    speakers: [],
-    closingHymn: { number: 166, title: 'Abide with Me!' },
-    closingPrayer: 'Brother Zwane',
-  },
-  {
-    id: 7,
-    date: '2026-11-08',
-    meetingType: 'regular',
-    presiding: 'Bishop Smith',
-    conducting: 'Brother Jones',
-    announcements: ['Ward temple night: November 14', 'Missionary farewell for Elder Zwane next Sunday'],
-    openingHymn: { number: 27, title: 'Praise to the Man' },
-    openingPrayer: 'Brother Mamba',
-    wardBusiness: [{ description: 'Sustaining of Brother Nxumalo as ward clerk' }],
-    stakeBusiness: false,
-    sacramentHymn: { number: 172, title: 'In Humility, Our Savior' },
-    speakers: [
-      { name: 'Sister Nxumalo', topic: 'Daily scripture study', type: 'speaker' },
-      { name: 'Sister Okafor', topic: 'Where Can I Turn for Peace?', type: 'musical-number' },
-      { name: 'Brother Nxumalo', topic: 'Keeping our covenants', type: 'speaker' },
-    ],
-    closingHymn: { number: 116, title: 'Come, Follow Me' },
-    closingPrayer: 'Sister Dube',
-  },
-  {
-    id: 8,
-    date: '2026-11-15',
-    meetingType: 'regular',
-    presiding: 'Bishop Smith',
-    conducting: 'Brother Mahlalela',
-    announcements: ['Elder Zwane enters the missionary training center on November 25'],
-    openingHymn: { number: 250, title: 'We Are All Enlisted' },
-    openingPrayer: 'Sister Zwane',
-    wardBusiness: [],
-    stakeBusiness: false,
-    sacramentHymn: { number: 194, title: 'There Is a Green Hill Far Away' },
-    speakers: [
-      { name: 'Brother Zwane', topic: 'Preparing to serve', type: 'speaker' },
-      { name: 'Elder Zwane', topic: 'Sharing the gospel with love', type: 'speaker' },
-    ],
-    closingHymn: { number: 152, title: 'God Be with You Till We Meet Again' },
-    closingPrayer: 'Brother Simelane',
-  },
-  {
-    id: 9,
-    date: '2026-11-22',
-    meetingType: 'regular',
-    presiding: 'Bishop Smith',
-    conducting: 'Brother Jones',
-    announcements: ['Ward Thanksgiving dinner on Saturday at 6:00 p.m.'],
-    openingHymn: { number: 94, title: 'Come, Ye Thankful People' },
-    openingPrayer: 'Brother Kunene',
-    wardBusiness: [],
-    stakeBusiness: false,
-    sacramentHymn: { number: 196, title: 'Jesus, Once of Humble Birth' },
-    speakers: [
-      { name: 'Sister Mamba', topic: 'Gratitude in all things', type: 'speaker' },
-      { name: 'Youth Choir', topic: 'Count Your Blessings', type: 'musical-number' },
-      { name: 'Bishop Smith', topic: 'Thankful hearts', type: 'speaker' },
-    ],
-    closingHymn: { number: 92, title: 'For the Beauty of the Earth' },
-    closingPrayer: 'Sister Peters',
-  },
-  {
-    id: 10,
-    date: '2026-11-29',
-    meetingType: 'regular',
-    presiding: 'Bishop Smith',
-    conducting: 'Brother Mahlalela',
-    openingHymn: { number: 72, title: 'Praise to the Lord, the Almighty' },
-    openingPrayer: 'Sister Simelane',
-    wardBusiness: [],
-    stakeBusiness: false,
-    sacramentHymn: { number: 175, title: 'O God, the Eternal Father' },
-    speakers: [
-      { name: 'Brother Hlophe', topic: 'Preparing for the Savior’s birth', type: 'speaker' },
-      { name: 'Sister Ncube', topic: 'Light of the world', type: 'speaker' },
-    ],
-    closingHymn: { number: 3, title: 'Now Let Us Rejoice' },
-    closingPrayer: 'Brother Ncube',
-  },
-];
+// Meetings now live in a Neon (serverless PostgreSQL) database provisioned through Vercel.
+// The connection string comes from DATABASE_URL (pulled into .env.local with `vercel env pull`).
+// Every query uses the sql tagged template, which sends ${values} as query parameters,
+// so user input can never change the SQL itself.
+const sql = neon(process.env.DATABASE_URL!);
 
-export function getMeetings(date?: string | null): SacramentMeeting[] {
-  const sorted = [...meetings].sort((a, b) => b.date.localeCompare(a.date));
-  if (date) return sorted.filter((m) => m.date === date);
-  return sorted;
+export const ITEMS_PER_PAGE = 5;
+
+/*
+ * The table uses snake_case columns; these aliases return rows in the camelCase shape of
+ * SacramentMeeting. to_char keeps the date as 'YYYY-MM-DD' text (a DATE would otherwise
+ * arrive as a JavaScript Date in UTC), and COALESCE turns a NULL list into an empty one.
+ * The columns are written out in each query because the tagged template only accepts values,
+ * not SQL fragments.
+ */
+
+/** ILIKE pattern that matches the search text anywhere, treating a typed % or _ literally. */
+function toSearchPattern(query: string): string {
+  return `%${query.trim().replace(/[\\%_]/g, (ch) => `\\${ch}`)}%`;
 }
 
-export function getMeetingById(id: number): SacramentMeeting | null {
-  return meetings.find((m) => m.id === id) ?? null;
+/**
+ * One page of meetings, newest first. The query matches the presiding or conducting leader,
+ * the meeting type, or any speaker or musical number (name or topic), ignoring case.
+ * An empty query matches every meeting.
+ */
+export async function getMeetings(query: string = '', currentPage: number = 1): Promise<SacramentMeeting[]> {
+  const pattern = toSearchPattern(query);
+  const page = Number.isInteger(currentPage) && currentPage > 0 ? currentPage : 1;
+  const offset = (page - 1) * ITEMS_PER_PAGE;
+
+  const rows = await sql`
+    SELECT
+      id,
+      to_char(date, 'YYYY-MM-DD')      AS "date",
+      meeting_type                     AS "meetingType",
+      presiding,
+      conducting,
+      COALESCE(announcements, '{}')    AS announcements,
+      opening_hymn                     AS "openingHymn",
+      opening_prayer                   AS "openingPrayer",
+      COALESCE(ward_business, '[]')    AS "wardBusiness",
+      COALESCE(stake_business, false)  AS "stakeBusiness",
+      sacrament_hymn                   AS "sacramentHymn",
+      COALESCE(speakers, '[]')         AS speakers,
+      closing_hymn                     AS "closingHymn",
+      closing_prayer                   AS "closingPrayer"
+    FROM meetings
+    WHERE presiding ILIKE ${pattern}
+       OR conducting ILIKE ${pattern}
+       OR meeting_type ILIKE ${pattern}
+       OR speakers::text ILIKE ${pattern}
+    ORDER BY date DESC
+    LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}`;
+
+  return rows as SacramentMeeting[];
+}
+
+/** Number of pages of results for the query (0 when nothing matches). */
+export async function getMeetingsTotalPages(query: string = ''): Promise<number> {
+  const pattern = toSearchPattern(query);
+
+  const rows = await sql`
+    SELECT COUNT(*) AS count
+    FROM meetings
+    WHERE presiding ILIKE ${pattern}
+       OR conducting ILIKE ${pattern}
+       OR meeting_type ILIKE ${pattern}
+       OR speakers::text ILIKE ${pattern}`;
+
+  return Math.ceil(Number(rows[0].count) / ITEMS_PER_PAGE);
+}
+
+/** One meeting by id, or null if there is no such meeting. */
+export async function getMeetingById(id: number): Promise<SacramentMeeting | null> {
+  // Ids larger than PostgreSQL's INTEGER range can't exist (and would make the query fail).
+  if (!Number.isInteger(id) || id <= 0 || id > 2147483647) return null;
+
+  const rows = await sql`
+    SELECT
+      id,
+      to_char(date, 'YYYY-MM-DD')      AS "date",
+      meeting_type                     AS "meetingType",
+      presiding,
+      conducting,
+      COALESCE(announcements, '{}')    AS announcements,
+      opening_hymn                     AS "openingHymn",
+      opening_prayer                   AS "openingPrayer",
+      COALESCE(ward_business, '[]')    AS "wardBusiness",
+      COALESCE(stake_business, false)  AS "stakeBusiness",
+      sacrament_hymn                   AS "sacramentHymn",
+      COALESCE(speakers, '[]')         AS speakers,
+      closing_hymn                     AS "closingHymn",
+      closing_prayer                   AS "closingPrayer"
+    FROM meetings
+    WHERE id = ${id}`;
+
+  return (rows[0] as SacramentMeeting | undefined) ?? null;
+}
+
+/**
+ * Meetings held on one date ('YYYY-MM-DD'). Used by GET /api/meetings?date= and by
+ * /meetings/current. The date column is UNIQUE, so the list has at most one meeting.
+ */
+export async function getMeetingsByDate(date: string): Promise<SacramentMeeting[]> {
+  const rows = await sql`
+    SELECT
+      id,
+      to_char(date, 'YYYY-MM-DD')      AS "date",
+      meeting_type                     AS "meetingType",
+      presiding,
+      conducting,
+      COALESCE(announcements, '{}')    AS announcements,
+      opening_hymn                     AS "openingHymn",
+      opening_prayer                   AS "openingPrayer",
+      COALESCE(ward_business, '[]')    AS "wardBusiness",
+      COALESCE(stake_business, false)  AS "stakeBusiness",
+      sacrament_hymn                   AS "sacramentHymn",
+      COALESCE(speakers, '[]')         AS speakers,
+      closing_hymn                     AS "closingHymn",
+      closing_prayer                   AS "closingPrayer"
+    FROM meetings
+    WHERE date = ${date}::date`;
+
+  return rows as SacramentMeeting[];
+}
+
+// ---------- Write operations (implemented in Week 04 with Server Actions) ----------
+
+export async function addMeeting(data: Omit<SacramentMeeting, 'id'>): Promise<SacramentMeeting> {
+  void data;
+  throw new Error('addMeeting: database implementation comes in Week 04');
+}
+
+export async function updateMeeting(
+  id: number,
+  updates: Partial<SacramentMeeting>
+): Promise<SacramentMeeting | null> {
+  void id;
+  void updates;
+  throw new Error('updateMeeting: database implementation comes in Week 04');
+}
+
+export async function deleteMeeting(id: number): Promise<boolean> {
+  void id;
+  throw new Error('deleteMeeting: database implementation comes in Week 04');
 }

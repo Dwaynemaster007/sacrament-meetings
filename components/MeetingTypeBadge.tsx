@@ -10,6 +10,7 @@ const colors: Record<MeetingType, string> = {
   testimony: 'bg-accent-soft text-accent border-amber-200',
   stake: 'bg-emerald-50 text-emerald-800 border-emerald-200',
   general: 'bg-purple-50 text-purple-800 border-purple-200',
+  special: 'bg-rose-50 text-rose-800 border-rose-200',
 };
 
 export default function MeetingTypeBadge({ type }: MeetingTypeBadgeProps) {

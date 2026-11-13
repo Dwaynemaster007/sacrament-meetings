@@ -10,11 +10,12 @@ export const MEETING_TYPE_LABELS: Record<MeetingType, string> = {
   regular: 'Sacrament Meeting',
   stake: 'Stake Conference',
   general: 'General Conference',
+  special: 'Special Meeting',
 };
 
 /** Stake and general conference Sundays replace the ward sacrament meeting. */
 export function isSacramentMeeting(type: MeetingType): boolean {
-  return type === 'testimony' || type === 'regular';
+  return type === 'testimony' || type === 'regular' || type === 'special';
 }
 
 /** "#169 · As Now We Take the Sacrament", or just the title when there is no hymn number. */

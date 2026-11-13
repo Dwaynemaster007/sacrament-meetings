@@ -8,17 +8,23 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<SacramentMeeting | ApiError>> {
   const { id: idParam } = await params;
-  const id = Number(idParam);
 
-  if (!Number.isInteger(id) || id <= 0) {
+  // Only digits count as an id, so "abc", "1.5", "-3" and "1e3" all get a 400.
+  if (!/^\d+$/.test(idParam) || Number(idParam) <= 0) {
     return NextResponse.json({ error: 'Meeting id must be a positive whole number' }, { status: 400 });
   }
+  const id = Number(idParam);
 
-  const meeting = getMeetingById(id);
+  try {
+    const meeting = await getMeetingById(id);
 
-  if (!meeting) {
-    return NextResponse.json({ error: `Meeting ${id} not found` }, { status: 404 });
+    if (!meeting) {
+      return NextResponse.json({ error: `Meeting ${id} not found` }, { status: 404 });
+    }
+
+    return NextResponse.json(meeting);
+  } catch (error) {
+    console.error(`GET /api/meetings/${id} failed:`, error);
+    return NextResponse.json({ error: 'Could not load the meeting. Please try again later.' }, { status: 500 });
   }
-
-  return NextResponse.json(meeting);
 }
