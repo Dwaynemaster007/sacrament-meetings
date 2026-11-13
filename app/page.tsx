@@ -1,21 +1,19 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { WARD_NAME } from '@/lib/meeting-utils';
-import chapel from '@/public/images/chapel.jpg';
+import temple from '@/public/images/temple.jpg';
 
 export default function Home() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
       <section className="overflow-hidden rounded-2xl border border-line bg-card shadow-sm">
         <Image
-          src={chapel}
-          alt="Illustration of a white chapel with a steeple among green hills at sunrise"
-          width={1200}
-          height={500}
+          src={temple}
+          alt="The white Nairobi Kenya Temple with its tall spire under a cloudy sky, surrounded by gardens"
           priority
           placeholder="blur"
           sizes="(max-width: 1024px) 100vw, 1024px"
-          className="h-auto w-full"
+          className="aspect-[2/1] w-full object-cover object-top"
         />
         <div className="p-6 sm:p-10">
           <p className="text-sm font-semibold uppercase tracking-widest text-accent">{WARD_NAME}</p>
