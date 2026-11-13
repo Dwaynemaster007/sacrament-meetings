@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import MeetingDetail from '@/components/MeetingDetail';
 import PrintButton from '@/components/PrintButton';
-import { fetchMeeting } from '@/lib/api';
+import { getMeetingById } from '@/lib/meetings-db';
 
 interface MeetingPageProps {
   params: Promise<{ id: string }>;
@@ -10,9 +10,9 @@ interface MeetingPageProps {
 
 export default async function MeetingPage({ params }: MeetingPageProps) {
   const { id } = await params;
-  const meeting = await fetchMeeting(id);
+  // Only digits count as an id; "abc" or "1.5" show the not-found page without a database call.
+  const meeting = /^\d+$/.test(id) ? await getMeetingById(Number(id)) : null;
 
-  // The API answers 400 for a non-numeric id and 404 for an unknown one; both show the not-found page.
   if (!meeting) notFound();
 
   return (
