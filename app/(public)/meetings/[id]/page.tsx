@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import MeetingDetail from '@/components/MeetingDetail';
 import PrintButton from '@/components/PrintButton';
+import DeleteMeetingButton from '@/components/DeleteMeetingButton';
+import { formatMeetingDate } from '@/lib/meeting-utils';
 import { getMeetingById } from '@/lib/meetings-db';
 
 interface MeetingPageProps {
@@ -21,7 +23,20 @@ export default async function MeetingPage({ params }: MeetingPageProps) {
         <Link href="/meetings" className="text-sm font-semibold text-brand hover:underline">
           ← Back to all meetings
         </Link>
-        <PrintButton />
+        <div className="flex flex-wrap items-center gap-4">
+          <Link
+            href={`/meetings/${meeting.id}/edit`}
+            className="rounded-lg border border-brand px-4 py-2 text-sm font-semibold text-brand hover:bg-brand hover:text-white"
+          >
+            Edit
+          </Link>
+          <DeleteMeetingButton
+            id={meeting.id}
+            label={formatMeetingDate(meeting.date)}
+            className="rounded-lg border border-red-700 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-700 hover:text-white disabled:opacity-60"
+          />
+          <PrintButton />
+        </div>
       </div>
       <MeetingDetail meeting={meeting} />
     </>

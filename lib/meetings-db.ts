@@ -128,23 +128,66 @@ export async function getMeetingsByDate(date: string): Promise<SacramentMeeting[
   return rows as SacramentMeeting[];
 }
 
-// ---------- Write operations (implemented in Week 04 with Server Actions) ----------
+// ---------- Write operations (called by the Server Actions in lib/actions.ts) ----------
 
-export async function addMeeting(data: Omit<SacramentMeeting, 'id'>): Promise<SacramentMeeting> {
-  void data;
-  throw new Error('addMeeting: database implementation comes in Week 04');
+/** Everything about a meeting except its database id. */
+export type MeetingInput = Omit<SacramentMeeting, 'id'>;
+
+/** True when a database error is a duplicate value in a UNIQUE column (Postgres code 23505). */
+export function isUniqueViolation(error: unknown): boolean {
+  return typeof error === 'object' && error !== null && 'code' in error && error.code === '23505';
 }
 
-export async function updateMeeting(
-  id: number,
-  updates: Partial<SacramentMeeting>
-): Promise<SacramentMeeting | null> {
-  void id;
-  void updates;
-  throw new Error('updateMeeting: database implementation comes in Week 04');
+/** Inserts a meeting and returns its new id. Throws on a duplicate date (see isUniqueViolation). */
+export async function addMeeting(input: MeetingInput): Promise<number> {
+  // JSON columns are sent as JSON text and cast with ::jsonb; TEXT[] values are sent as arrays.
+  const rows = await sql`
+    INSERT INTO meetings (
+      date, meeting_type, presiding, conducting, announcements,
+      opening_hymn, opening_prayer, ward_business, stake_business,
+      sacrament_hymn, speakers, closing_hymn, closing_prayer
+    ) VALUES (
+      ${input.date}::date, ${input.meetingType}, ${input.presiding}, ${input.conducting},
+      ${input.announcements ?? []},
+      ${JSON.stringify(input.openingHymn)}::jsonb, ${input.openingPrayer},
+      ${JSON.stringify(input.wardBusiness)}::jsonb, ${input.stakeBusiness},
+      ${JSON.stringify(input.sacramentHymn)}::jsonb, ${JSON.stringify(input.speakers)}::jsonb,
+      ${JSON.stringify(input.closingHymn)}::jsonb, ${input.closingPrayer}
+    )
+    RETURNING id`;
+
+  return Number(rows[0].id);
 }
 
+/** Replaces a meeting's details. Returns false if no meeting has that id. */
+export async function updateMeeting(id: number, input: MeetingInput): Promise<boolean> {
+  if (!Number.isInteger(id) || id <= 0 || id > 2147483647) return false;
+
+  const rows = await sql`
+    UPDATE meetings SET
+      date = ${input.date}::date,
+      meeting_type = ${input.meetingType},
+      presiding = ${input.presiding},
+      conducting = ${input.conducting},
+      announcements = ${input.announcements ?? []},
+      opening_hymn = ${JSON.stringify(input.openingHymn)}::jsonb,
+      opening_prayer = ${input.openingPrayer},
+      ward_business = ${JSON.stringify(input.wardBusiness)}::jsonb,
+      stake_business = ${input.stakeBusiness},
+      sacrament_hymn = ${JSON.stringify(input.sacramentHymn)}::jsonb,
+      speakers = ${JSON.stringify(input.speakers)}::jsonb,
+      closing_hymn = ${JSON.stringify(input.closingHymn)}::jsonb,
+      closing_prayer = ${input.closingPrayer}
+    WHERE id = ${id}
+    RETURNING id`;
+
+  return rows.length > 0;
+}
+
+/** Deletes a meeting. Returns false if no meeting has that id. */
 export async function deleteMeeting(id: number): Promise<boolean> {
-  void id;
-  throw new Error('deleteMeeting: database implementation comes in Week 04');
+  if (!Number.isInteger(id) || id <= 0 || id > 2147483647) return false;
+
+  const rows = await sql`DELETE FROM meetings WHERE id = ${id} RETURNING id`;
+  return rows.length > 0;
 }

@@ -28,10 +28,20 @@ export default async function MeetingsPage({ searchParams }: MeetingsPageProps) 
 
   return (
     <>
-      <h1 className="font-serif text-3xl font-bold text-ink">Sacrament meetings</h1>
-      <p className="mt-2 text-muted">
-        Select a Sunday to view its full program. Meetings are listed newest first.
-      </p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-3xl font-bold text-ink">Sacrament meetings</h1>
+          <p className="mt-2 text-muted">
+            Select a Sunday to view its full program. Meetings are listed newest first.
+          </p>
+        </div>
+        <Link
+          href="/meetings/new"
+          className="rounded-lg bg-brand px-4 py-2 font-semibold text-white hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+        >
+          Plan a meeting
+        </Link>
+      </div>
 
       <MeetingSearch />
 

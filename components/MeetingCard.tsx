@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { SacramentMeeting } from '@/lib/types';
 import { formatHymn, formatMeetingDate, isSacramentMeeting } from '@/lib/meeting-utils';
 import MeetingTypeBadge from './MeetingTypeBadge';
+import DeleteMeetingButton from './DeleteMeetingButton';
 
 interface MeetingCardProps {
   meeting: SacramentMeeting;
@@ -52,6 +53,16 @@ export default function MeetingCard({ meeting, isCurrent = false }: MeetingCardP
         </div>
       </dl>
       <p className="mt-auto pt-4 text-sm font-medium text-brand">{summary} →</p>
+      {/* relative z-10 lifts these controls above the card's stretched link so they stay clickable. */}
+      <div className="relative z-10 mt-4 flex items-center gap-5 border-t border-line pt-3 text-sm">
+        <Link
+          href={`/meetings/${meeting.id}/edit`}
+          className="font-semibold text-brand hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+        >
+          Edit<span className="sr-only"> meeting on {formatMeetingDate(meeting.date)}</span>
+        </Link>
+        <DeleteMeetingButton id={meeting.id} label={formatMeetingDate(meeting.date)} />
+      </div>
     </article>
   );
 }
